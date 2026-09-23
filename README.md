@@ -1,17 +1,57 @@
-# STC8G/STC8H 裸机工程模板
-> 一句话定位：开箱即用的 8051 裸机模板，自带 1ms 时基、钩子调度和 printf 串口
+# stc8h8g_lib_template
 
-## ✨ 效果演示        ← 串口 115200 心跳截图 / 板子运行 GIF（最关键）
-## 🎯 特性
-  - Timer0 驱动的 1ms Tick 时基，回绕安全的时间差值 API
-  - 钩子机制：模块把短任务注册进钩子表，中断每 1ms 自动分发
-  - 模块化三件套 _Init()/_Handler()/_Tick() 程序模板，复制即用
-  - printf 重定向 UART1，115200 开箱即用
-  - EIDE(VS Code) + Keil uVision 双工程
-## 🚀 快速开始      ← 改 Config.h 晶振 → 编译 → 烧录 → 看串口，4 步
-## 🧩 核心机制      ← Tick 原理图（你 CLAUDE.md 里那张现成的）
-## 📦 新增一个模块    ← 怎么加一个 1ms 任务 / 周期任务（放示例代码）
-## 📂 目录结构
-## ⚠️ 避坑清单       ← XDATALEN=0 显式初始化、EA=1 前注册钩子、禁止钩子内 printf
-## 📝 变更日志
-## 📄 License
+STC8H 和 STC8G 的通用裸机工程模板：Timer0 驱动 **1ms Tick 时基 + 钩子机制**，串口1（115200）已初始化、`printf` 开箱即用，支持 **EIDE（VS Code）+ Keil uVision** 双工程。
+
+## ☕ 支持与打赏
+
+如果这个工程帮你省了时间，欢迎请作者喝杯咖啡；也欢迎点 ⭐ Star 让更多人看到：
+
+- 爱发电：`https://afdian.com/a/你的ID`（**发布前替换成你的链接**）
+- GitHub Sponsors：`https://github.com/sponsors/你的用户名`（可选）
+
+> 打赏不设门槛，一块钱也是鼓励。
+
+# 编辑日期：20260203
+
+# 文件说明：
+│  keilclean.bat -> 清除临时文件脚本
+│      
+├─build
+│  └─Target 1
+│          STC8G-H-LIB-template.hex -> 量产烧录文件
+│          
+├─Driver -> 官方硬设函数库
+│  │  UPDATE-NOTE.txt -> 更新说明
+│  ├─inc -> 头文件
+│  ├─isr -> 中断函数
+│  └─src -> 函数原型
+│          
+├─RVMDK -> 项目工程文件
+│  │  STARTUP.A51
+│  │  STC8G-H-LIB.uvproj
+│  ├─Listings
+│  └─Objects
+│          STC8G-H-LIB.hex -> 量产烧录文件
+│          stc_tool_config.cfg -> STC烧录软件配置文件
+│          stc_tool_config使用说明.png -> STC烧录软件配置文件使用说明
+│          
+└─User -> 程序源代码文件
+
+# 芯片不同工况的电流情况
+   1、使用全浮空输入时，端口输入模拟信号，待机电流会增高
+   2、浮空输入端口，如果使用开关电源供电，待机电流会增高，使用电池则不会出现这种问题
+   3、设置内部32kHz时钟后，需要把IRC(内部高速时钟)关闭才能使功耗优化
+   休眠3.3uA时，没有关闭实测839uA；关闭后与规格书标称相符，实测491uA。
+      a、  1倍分频：491uA
+      b、 32倍分频：486uA
+      c、 64倍分频：487uA
+      d、128倍分频：486uA
+      e、255倍分频：486uA
+   功耗和时钟分频没有太直接的关系。
+
+# 20260203
+   在官方基础上加入：
+   1、在"Type_def.h"头文件加入一些新定义
+
+# 20260923
+   1、新增 Tick 1ms 时基与钩子机制（Timer0 中断驱动、钩子表分发），新增模块程序模板，并补全 User/ 层 if/for 大括号统一风格
